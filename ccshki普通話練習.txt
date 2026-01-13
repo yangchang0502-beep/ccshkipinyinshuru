@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>楊老師普通話打字練習 - 最終完美版</title>
+    
+    <!-- 核心庫引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/pinyin-pro@3.19.1/dist/index.js"></script>
+    
+    <!-- 字體引入 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['"Noto Sans TC"', 'sans-serif'],
+                        'pinyin': ['"Helvetica Neue"', 'Helvetica', 'Arial', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        sky: {
+                            light: '#E0F7FA',
+                            DEFAULT: '#4FC3F7',
+                            deep: '#0288D1'
+                        },
+                        theme: {
+                            main: '#0096E8',
+                            accent: '#FFB300',
+                            soft: '#E3F2FD'
+                        }
+                    },
+                    animation: {
+                        'float-cloud-slow': 'floatCloud 60s linear infinite',
+                        'bounce-soft': 'bounceSoft 2s infinite',
+                        'pop': 'pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        'jelly': 'jelly 0.5s both',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                        'blink': 'blink 4s infinite',
+                        'wing-flap': 'wingFlap 1.2s ease-in-out infinite',
+                        'owl-float': 'owlFloat 3s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        floatCloud: {
+                            '0%': { transform: 'translateX(-150%)' },
+                            '100%': { transform: 'translateX(100vw)' },
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        pop: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        jelly: {
+                            '0%': { transform: 'scale3d(1, 1, 1)' },
+                            '30%': { transform: 'scale3d(1.25, 0.75, 1)' },
+                            '40%': { transform: 'scale3d(0.75, 1.25, 1)' },
+                            '50%': { transform: 'scale3d(1.15, 0.85, 1)' },
+                            '65%': { transform: 'scale3d(0.95, 1.05, 1)' },
+                            '75%': { transform: 'scale3d(1.05, 0.95, 1)' },
+                            '100%': { transform: 'scale3d(1, 1, 1)' }
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        blink: {
+                            '0%, 96%, 100%': { transform: 'scaleY(1)' },
+                            '98%': { transform: 'scaleY(0.1)' }
+                        },
+                        wingFlap: {
+                            '0%, 100%': { transform: 'rotate(0deg)' },
+                            '50%': { transform: 'rotate(25deg)' }
+                        },
+                        owlFloat: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-8px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* --- 全局設定 --- */
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, #4FC3F7 0%, #81D4FA 40%, #B3E5FC 100%);
+            overflow-x: hidden;
+            user-select: none;
+            min-height: 100vh;
+        }
+        
+        /* --- 標題特效 --- */
+        .title-special {
+            color: #0277BD;
+            text-shadow: 3px 3px 0px #FFFFFF, 6px 6px 0px rgba(0,0,0,0.1);
+            -webkit-text-stroke: 2px #FFFFFF; 
+            paint-order: stroke fill;
+            letter-spacing: 2px;
+        }
+
+        /* --- 背景特效層 --- */
+        .background-layer { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            pointer-events: none; z-index: 0; overflow: hidden; 
+        }
+
+        .sun-ray {
+            position: absolute; top: -100px; left: -100px; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+            filter: blur(20px); animation: owlFloat 10s ease-in-out infinite;
+        }
+
+        /* 雲朵樣式 */
+        .cloud { 
+            position: absolute; background: #FFFFFF; border-radius: 100px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
+        }
+        .cloud::after, .cloud::before { 
+            content: ''; position: absolute; background: #FFFFFF; border-radius: 50%; 
+        }
+        
+        .cloud-1 { width: 260px; height: 80px; top: 10%; left: -300px; opacity: 0.9; animation: floatCloud 65s linear infinite; animation-delay: -20s; }
+        .cloud-1::after { width: 100px; height: 100px; top: -50px; left: 40px; }
+        .cloud-1::before { width: 90px; height: 90px; top: -30px; left: 130px; }
+        
+        .cloud-2 { width: 180px; height: 60px; top: 30%; left: -200px; opacity: 0.75; animation: floatCloud 45s linear infinite; animation-delay: -5s; }
+        .cloud-2::after { width: 70px; height: 70px; top: -35px; left: 25px; }
+        .cloud-2::before { width: 60px; height: 60px; top: -25px; left: 80px; }
+        
+        .cloud-3 { width: 300px; height: 90px; top: 55%; left: -400px; opacity: 0.6; animation: floatCloud 80s linear infinite; animation-delay: -40s; }
+        .cloud-3::after { width: 110px; height: 110px; top: -55px; left: 50px; }
+        .cloud-3::before { width: 100px; height: 100px; top: -35px; left: 150px; }
+
+        .cloud-4 { width: 200px; height: 70px; top: 5%; left: -250px; opacity: 0.5; animation: floatCloud 75s linear infinite; animation-delay: -10s; transform: scale(0.7); }
+        .cloud-4::after { width: 80px; height: 80px; top: -40px; left: 30px; }
+        .cloud-4::before { width: 70px; height: 70px; top: -25px; left: 100px; }
+
+        .cloud-5 { width: 280px; height: 90px; top: 75%; left: -350px; opacity: 0.8; animation: floatCloud 55s linear infinite; animation-delay: -35s; }
+        .cloud-5::after { width: 110px; height: 110px; top: -55px; left: 50px; }
+        .cloud-5::before { width: 100px; height: 100px; top: -35px; left: 150px; }
+
+        .cloud-6 { width: 220px; height: 75px; top: 40%; left: -280px; opacity: 0.4; animation: floatCloud 90s linear infinite; animation-delay: -60s; transform: scale(0.8); }
+        .cloud-6::after { width: 90px; height: 90px; top: -45px; left: 35px; }
+        .cloud-6::before { width: 80px; height: 80px; top: -25px; left: 110px; }
+
+        /* 粒子動畫 */
+        @keyframes floatParticleAnim {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+        }
+
+        .particle {
+            position: absolute; color: rgba(255, 255, 255, 0.7); font-weight: 900;
+            font-family: 'Arial', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            user-select: none; animation-name: floatParticleAnim;
+            animation-timing-function: linear; animation-iteration-count: infinite;
+            bottom: -50px;
+        }
+
+        /* 底部山丘 */
+        .landscape { position: fixed; bottom: 0; left: 0; width: 100%; height: 20%; pointer-events: none; z-index: 0; }
+        .hill { position: absolute; bottom: -50px; border-radius: 50% 50% 0 0; }
+        .hill-1 { width: 120%; height: 200px; background: #81C784; left: -10%; opacity: 0.8; }
+        .hill-2 { width: 120%; height: 150px; background: #66BB6A; right: -10%; opacity: 0.9; bottom: -30px; }
+        .hill-3 { width: 100%; height: 100px; background: #43A047; left: 0; opacity: 1; bottom: -40px; }
+
+        /* --- 玻璃質感面板 --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 3px solid rgba(255, 255, 255, 1);
+            box-shadow: 0 15px 35px -5px rgba(0, 80, 150, 0.15), inset 0 0 20px rgba(255,255,255,0.5);
+            border-radius: 24px;
+        }
+
+        /* --- 年級卡片 --- */
+        .grade-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        @media (min-width: 768px) { .grade-grid { grid-template-columns: repeat(6, 1fr); gap: 20px; } }
+
+        .grade-card {
+            position: relative; border-radius: 16px; padding: 10px 5px; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-width: 2px; border-style: solid;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.05), 0 8px 10px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 120px; background-color: white;
+        }
+        .grade-card:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.1), inset 0 4px 8px rgba(0,0,0,0.05); }
+        .grade-card.active { transform: translateY(4px); box-shadow: inset 0 4px 8px rgba(0,0,0,0.1); filter: brightness(0.95); }
+        .grade-card .num { font-size: 2.8rem; margin-bottom: 2px; font-weight: 700; }
+        .grade-card .label { font-size: 1.2rem; letter-spacing: 1px; font-weight: 700; }
+
+        .g-1 { background-color: #FFEBEB; border-color: #FF6B6B; } .g-1 .num, .g-1 .label { color: #FF4757; }
+        .g-2 { background-color: #FFF3E0; border-color: #FF9F43; } .g-2 .num, .g-2 .label { color: #F39C12; }
+        .g-3 { background-color: #FFFDE7; border-color: #FDCB6E; } .g-3 .num, .g-3 .label { color: #F1C40F; }
+        .g-4 { background-color: #E8F5E9; border-color: #2ECC71; } .g-4 .num, .g-4 .label { color: #27AE60; }
+        .g-5 { background-color: #E3F2FD; border-color: #54A0FF; } .g-5 .num, .g-5 .label { color: #2980B9; }
+        .g-6 { background-color: #F3E5F5; border-color: #9B59B6; } .g-6 .num, .g-6 .label { color: #8E44AD; }
+
+        /* --- 按鈕樣式 --- */
+        .hint-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 12px 24px; border-radius: 16px;
+            font-family: 'Noto Sans TC', sans-serif; font-weight: 700; font-size: 1.2rem;
+            border: none; cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.1), 0 8px 15px rgba(0,0,0,0.1);
+            color: white; position: relative; min-width: 120px;
+        }
+        .hint-btn:hover { transform: translateY(-3px); filter: brightness(1.05); }
+        .hint-btn:active { transform: translateY(4px); box-shadow: none; }
+        .hint-icon { width: 24px; height: 24px; fill: currentColor; }
+        .hint-blue { background: #4FC3F7; border-bottom: 5px solid #29B6F6; }
+        .hint-green { background: #81C784; border-bottom: 5px solid #66BB6A; }
+        .hint-orange { background: #FFB74D; border-bottom: 5px solid #FFA726; }
+
+        .btn-3d {
+            position: relative; border: none; transition: all 0.1s; transform: translateY(0);
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            cursor: pointer; font-family: 'Noto Sans TC', sans-serif; font-weight: 700; letter-spacing: 1px;
+        }
+        .btn-3d:active { transform: translateY(4px) !important; box-shadow: 0 0px 0 0 !important; }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #4FC3F7, #0096E8); color: white;
+            box-shadow: 0 4px 0 #0077B8, 0 8px 15px rgba(0, 150, 232, 0.3);
+            border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn-circle-confirm {
+            background: linear-gradient(to bottom, #4FC3F7, #0096E8); color: white;
+            box-shadow: 0 4px 0 #0077B8, 0 6px 10px rgba(0, 150, 232, 0.3);
+            border-radius: 50%; border: 2px solid white;
+            width: 50px; height: 50px; font-size: 1.5rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.1s; cursor: pointer;
+        }
+        .btn-circle-confirm:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-circle-confirm:active { transform: translateY(4px) !important; box-shadow: none !important; }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #58D68D, #27AE60); color: white;
+            box-shadow: 0 4px 0 #1E8449, 0 8px 15px rgba(46, 204, 113, 0.3);
+            border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* --- 音樂控制面板 --- */
+        .music-controls-container {
+            position: fixed; bottom: 30px; left: 30px; z-index: 100;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            padding: 10px 18px; border-radius: 50px;
+            display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); border: 3px solid white;
+            transition: all 0.3s;
+        }
+        .music-controls-container:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+        .music-toggle-btn {
+            background: #E0F7FA; border-radius: 50%; width: 42px; height: 42px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s; border: 2px solid #4FC3F7; color: #0096E8;
+        }
+        .music-toggle-btn.playing { background: #4FC3F7; color: white; border-color: #0288D1; }
+        .music-icon { width: 22px; height: 22px; fill: currentColor; }
+
+        .volume-slider-container { display: flex; align-items: center; gap: 8px; }
+        .volume-slider { 
+            -webkit-appearance: none; width: 100px; height: 8px; 
+            background: #E0E0E0; border-radius: 10px; outline: none; 
+            overflow: hidden;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%;
+            background: #0096E8; cursor: pointer; border: 2px solid white; 
+            box-shadow: -100px 0 0 92px #4FC3F7;
+        }
+
+        /* --- 輸入框與聲調 --- */
+        .input-pill {
+            border: 3px solid #BDE0FE; background: #FFFFFF; border-radius: 16px; transition: all 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            font-family: "Helvetica Neue", Helvetica, Arial, "Noto Sans TC", sans-serif; font-weight: 600;
+        }
+        .input-pill:focus { outline: none; border-color: #0096E8; box-shadow: 0 0 0 4px rgba(0, 150, 232, 0.15); }
+
+        .tone-btn {
+            width: 45px; height: 45px; border-radius: 10px; border: none;
+            font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-weight: 700; font-size: 1.4rem;
+            color: white; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+        }
+        @media (min-width: 768px) { .tone-btn { width: 50px; height: 50px; font-size: 1.5rem; border-radius: 12px; } }
+        .tone-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .tone-btn:active { transform: translateY(2px) scale(0.95); box-shadow: none !important; }
+        
+        .tone-1 { background: #FF6B6B; box-shadow: 0 4px 0 #EE5253; }
+        .tone-2 { background: #2ECC71; box-shadow: 0 4px 0 #27AE60; }
+        .tone-3 { background: #9B59B6; box-shadow: 0 4px 0 #8E44AD; }
+        .tone-4 { background: #54A0FF; box-shadow: 0 4px 0 #2E86DE; }
+        .tone-5 { background: #95A5A6; box-shadow: 0 4px 0 #7F8C8D; }
+
+        /* --- 貓頭鷹 Avatar --- */
+        .owl-avatar { 
+            width: 160px; height: 160px; position: relative; margin: 0 auto; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); 
+            transition: transform 0.3s; 
+            animation: owlFloat 3s ease-in-out infinite;
+        }
+        .owl-avatar:hover { transform: scale(1.05) rotate(2deg); }
+        
+        .owl-body { 
+            width: 140px; height: 150px; 
+            background: linear-gradient(135deg, #42A5F5 0%, #1976D2 100%);
+            border-radius: 50% 50% 45% 45%; 
+            position: absolute; left: 10px; top: 5px; 
+            border: 4px solid #0D47A1; overflow: hidden;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .owl-belly { 
+            width: 100px; height: 90px; background: #E3F2FD; border-radius: 50%; 
+            position: absolute; bottom: 5px; left: 20px; 
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.05);
+        }
+        
+        .owl-glasses { position: absolute; top: 35px; width: 100%; height: 50px; z-index: 15; }
+        .glass-l, .glass-r { width: 54px; height: 54px; border: 4px solid #37474F; border-radius: 50%; position: absolute; top: 0; }
+        .glass-l { left: 12px; } .glass-r { right: 12px; }
+        .glass-bridge { width: 20px; height: 4px; background: #37474F; position: absolute; top: 25px; left: 60px; }
+
+        .owl-eye { width: 46px; height: 46px; background: white; border-radius: 50%; position: absolute; top: 4px; z-index: 10; overflow: hidden; }
+        .owl-eye.left { left: 4px; } .owl-eye.right { right: 4px; }
+        
+        .owl-pupil { 
+            width: 18px; height: 18px; background: #212121; border-radius: 50%; position: absolute; top: 14px; 
+            animation: blink 4s infinite; 
+        }
+        .owl-pupil::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; position: absolute; top: 3px; right: 4px; }
+        .owl-pupil.left { right: 8px; } .owl-pupil.right { left: 8px; }
+        
+        .owl-beak { 
+            width: 0; height: 0; 
+            border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 18px solid #FFB300; 
+            position: absolute; top: 85px; left: 58px; z-index: 16; 
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); 
+        }
+        
+        .owl-wing { 
+            width: 35px; height: 70px; 
+            background: linear-gradient(to bottom, #2196F3, #1565C0);
+            border: 3px solid #0D47A1; border-radius: 20px 20px 40px 40px; 
+            position: absolute; top: 60px; z-index: 5; 
+        }
+        .owl-wing.left { left: -10px; transform-origin: top right; animation: wingFlap 1.2s ease-in-out infinite; }
+        .owl-wing.right { right: -10px; transform-origin: top left; animation: wingFlap 1.2s ease-in-out infinite reverse; }
+        
+        .owl-ear { 
+            width: 0; height: 0; 
+            border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 30px solid #1976D2; 
+            position: absolute; top: -15px; z-index: 1; 
+        }
+        .owl-ear.left { left: 15px; transform: rotate(-15deg); } .owl-ear.right { right: 15px; transform: rotate(15deg); }
+        
+        .owl-tie {
+            width: 0; height: 0;
+            border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #D32F2F;
+            position: absolute; top: 100px; left: 60px; z-index: 14;
+        }
+        .owl-tie::after {
+            content: ''; position: absolute; top: -3px; left: -6px;
+            width: 12px; height: 25px; background: #D32F2F;
+            clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+        }
+
+        .mortarboard { position: absolute; top: -25px; left: 25px; z-index: 20; transform: rotate(-8deg); }
+        .mb-top { width: 90px; height: 22px; background: #37474F; transform: skew(-20deg); border-radius: 4px; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); }
+        .mb-cap { width: 55px; height: 30px; background: #37474F; margin-left: 22px; margin-top: -8px; border-radius: 5px 5px 0 0; }
+        .mb-tassel { width: 4px; height: 35px; background: #FFC107; position: absolute; right: 10px; top: 10px; }
+        .mb-tassel::after { content: ''; width: 12px; height: 12px; background: #FFC107; border-radius: 50%; position: absolute; bottom: -6px; left: -4px; }
+
+        /* --- 統計卡片 --- */
+        .stat-card {
+            background: white; border-radius: 16px; padding: 15px;
+            border: 1px solid #E0F7FA; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-value { font-size: 1.8rem; font-weight: 900; color: #0096E8; line-height: 1.2; }
+        .stat-label { font-size: 0.9rem; font-weight: 700; color: #7F8C8D; margin-top: 4px; }
+    </style>
+</head>
+<body class="h-full text-gray-800 font-sans font-medium">
+
+    <!-- 背景音樂 -->
+    <audio id="bgmAudio" loop>
+        <source src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+        您的瀏覽器不支援音樂播放。
+    </audio>
+
+    <!-- 背景元素 -->
+    <div class="background-layer">
+        <div class="sun-ray"></div>
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="cloud cloud-4"></div>
+        <div class="cloud cloud-5"></div>
+        <div class="cloud cloud-6"></div>
+        <div id="particlesContainer"></div>
+    </div>
+
+    <!-- 底部山丘 -->
+    <div class="landscape">
+        <div class="hill hill-1"></div>
+        <div class="hill hill-2"></div>
+        <div class="hill hill-3"></div>
+    </div>
+
+    <!-- 音樂控制面板 -->
+    <div class="music-controls-container">
+        <button id="musicToggle" class="music-toggle-btn" title="開關背景音樂" onclick="toggleMusic()">
+            <svg class="music-icon" viewBox="0 0 24 24">
+                <path id="musicIconPath" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+            </svg>
+        </button>
+        <div class="volume-slider-container">
+            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M7 9v6h4l5 5V4l-5 5H7z"/></svg>
+            <input type="range" min="0" max="1" step="0.01" value="0.3" id="volumeSlider" class="volume-slider" oninput="adjustVolume(this.value)" onchange="adjustVolume(this.value, true)" title="調整音量">
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        </div>
+    </div>
+
+    <!-- 主應用容器 -->
+    <div id="app" class="h-full relative z-10 flex flex-col">
+        
+        <!-- 主選單 -->
+        <div id="mainMenu" class="min-h-screen flex flex-col items-center justify-center py-8 px-4">
+            <div class="w-full max-w-4xl flex flex-col items-center">
+                
+                <!-- 標題區域 -->
+                <header class="text-center mb-10 relative">
+                    <div class="owl-avatar mb-6">
+                        <div class="mortarboard">
+                            <div class="mb-top"></div><div class="mb-cap"></div><div class="mb-tassel"></div>
+                        </div>
+                        <div class="owl-ear left"></div><div class="owl-ear right"></div>
+                        <div class="owl-wing left"></div><div class="owl-wing right"></div>
+                        <div class="owl-body">
+                            <div class="owl-belly"></div>
+                            <div class="owl-glasses">
+                                <div class="glass-l"><div class="owl-eye left"><div class="owl-pupil left"></div></div></div>
+                                <div class="glass-bridge"></div>
+                                <div class="glass-r"><div class="owl-eye right"><div class="owl-pupil right"></div></div></div>
+                            </div>
+                            <div class="owl-beak"></div>
+                            <div class="owl-tie"></div>
+                        </div>
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-6xl font-black mb-4 title-special">普通話打字練習</h1>
+                    <div class="inline-block bg-white px-8 py-2 rounded-full border-2 border-theme-main shadow-lg">
+                        <span class="text-xl text-theme-main font-bold">跟着楊老師一起快樂學拼音！✨</span>
+                    </div>
+                </header>
+
+                <!-- 學生資料卡 -->
+                <div class="glass-panel p-8 mb-8 w-full max-w-lg transform transition hover:scale-[1.01]">
+                    <div class="flex items-center justify-center gap-3 mb-6">
+                        <span class="text-2xl">📝</span>
+                        <h3 class="text-2xl text-theme-main font-bold">學生資料</h3>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-gray-600 font-bold mb-2 ml-2 text-base">選擇班級</label>
+                            <div class="relative">
+                                <select id="studentClass" onchange="updateStudentList()" class="input-pill w-full px-5 py-3 text-lg text-center appearance-none cursor-pointer font-bold text-gray-700 bg-white">
+                                    <option value="">請選擇班級...</option>
+                                    <option value="1A">1A</option><option value="2A">2A</option><option value="3A">3A</option>
+                                    <option value="4A">4A</option><option value="5A">5A</option><option value="5B">5B</option>
+                                    <option value="6A">6A</option><option value="6B">6B</option>
+                                </select>
+                                <div class="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none text-theme-main text-lg">▼</div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 font-bold mb-2 ml-2 text-base">選擇姓名</label>
+                            <div class="relative">
+                                <select id="studentName" class="input-pill w-full px-5 py-3 text-lg text-center appearance-none cursor-pointer font-bold text-gray-700 bg-white" disabled>
+                                    <option value="">請先選擇班級</option>
+                                </select>
+                                <div class="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none text-theme-main text-lg">▼</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 年級選擇 -->
+                <div class="glass-panel p-8 mb-8 w-full">
+                    <div class="flex items-center justify-center gap-3 mb-8">
+                        <span class="text-2xl">🎯</span>
+                        <h3 class="text-2xl text-theme-main font-bold">選擇年級</h3>
+                    </div>
+                    <div class="grade-grid">
+                        <button onclick="selectGrade(1, this)" class="grade-card g-1"><span class="num">1</span><span class="label">一年級</span></button>
+                        <button onclick="selectGrade(2, this)" class="grade-card g-2"><span class="num">2</span><span class="label">二年級</span></button>
+                        <button onclick="selectGrade(3, this)" class="grade-card g-3"><span class="num">3</span><span class="label">三年級</span></button>
+                        <button onclick="selectGrade(4, this)" class="grade-card g-4"><span class="num">4</span><span class="label">四年級</span></button>
+                        <button onclick="selectGrade(5, this)" class="grade-card g-5"><span class="num">5</span><span class="label">五年級</span></button>
+                        <button onclick="selectGrade(6, this)" class="grade-card g-6"><span class="num">6</span><span class="label">六年級</span></button>
+                    </div>
+                </div>
+
+                <!-- 模式選擇 -->
+                <div id="practiceSelection" class="hidden w-full grid md:grid-cols-2 gap-6 animate-pop">
+                    <button onclick="startVocabularyPractice()" class="btn-3d btn-primary w-full p-6 flex flex-col items-center gap-3 group overflow-hidden relative rounded-2xl">
+                        <div class="absolute -right-6 -top-6 text-8xl opacity-10 group-hover:scale-110 transition-transform rotate-12">📖</div>
+                        <span class="text-4xl filter drop-shadow-md">📚</span>
+                        <h3 class="text-3xl font-bold">詞語練習</h3>
+                        <span class="bg-white/20 px-4 py-1 rounded-full text-base font-medium" id="vocabCount">5個隨機詞彙</span>
+                    </button>
+
+                    <button onclick="startArticlePractice()" class="btn-3d btn-green w-full p-6 flex flex-col items-center gap-3 group overflow-hidden relative rounded-2xl">
+                        <div class="absolute -right-6 -top-6 text-8xl opacity-10 group-hover:scale-110 transition-transform rotate-12">📝</div>
+                        <span class="text-4xl filter drop-shadow-md">✍️</span>
+                        <h3 class="text-3xl font-bold">文章練習</h3>
+                        <span class="bg-white/20 px-4 py-1 rounded-full text-base font-medium" id="articleCount">隨機文章句子</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 練習界面 -->
+        <div id="practiceScreen" class="hidden min-h-screen flex flex-col">
+            <div class="bg-white/90 backdrop-blur-md border-b-2 border-gray-100 shadow-sm sticky top-0 z-50">
+                <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <button onclick="backToMenu()" class="btn-3d bg-gray-100 text-gray-600 w-10 h-10 text-xl rounded-lg shadow-[0_3px_0_#cbd5e1]">🏠</button>
+                        <h2 id="modeTitle" class="text-2xl text-theme-main font-bold">練習模式</h2>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2 bg-blue-50 border border-blue-100 px-4 py-1.5 rounded-full">
+                            <span class="animate-pulse text-lg">⏰</span>
+                            <span id="timer" class="font-bold text-theme-main text-xl tabular-nums">00:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container mx-auto px-4 py-8 flex-1 flex flex-col max-w-4xl">
+                <div class="mb-8 bg-white p-2 rounded-full shadow-md border-2 border-gray-100">
+                    <div class="flex justify-between text-base font-bold text-gray-500 mb-1 px-3">
+                        <span>🚀 加油！</span><span id="progressText">0/0</span>
+                    </div>
+                    <div class="bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div id="progressBar" class="bg-gradient-to-r from-theme-main to-cyan-300 h-full rounded-full transition-all duration-500 relative overflow-hidden" style="width: 0%">
+                            <div class="absolute inset-0 bg-white/30 w-full h-full animate-[shimmer_2s_infinite]"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center">
+                    <div class="w-full text-center mb-8 relative">
+                        <div class="absolute -top-2 right-0 z-50">
+                             <button onclick="refreshQuestions()" class="flex items-center gap-2 px-4 py-2 bg-white text-gray-500 hover:text-theme-main transition-all rounded-full shadow-md border-2 border-gray-100 hover:shadow-lg group font-bold text-sm" title="換一組題目">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                換一題
+                            </button>
+                        </div>
+                        <div id="currentCharacter" class="glass-panel inline-block px-12 py-10 text-5xl md:text-6xl font-black text-gray-800 min-w-[260px] relative z-10 shadow-xl transform transition hover:scale-105 duration-300 font-sans mt-8">漢</div>
+                        <div class="mt-8">
+                            <span id="characterMeaning" class="bg-white px-8 py-3 rounded-full text-xl text-theme-main font-bold shadow-md border border-theme-main/20 inline-block">解釋文字</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 mb-8 flex-wrap justify-center">
+                        <button onclick="toggleHint('initials')" class="hint-btn hint-blue">聲母</button>
+                        <button onclick="toggleHint('finals')" class="hint-btn hint-green">韻母</button>
+                        <button onclick="toggleHint('full')" class="hint-btn hint-orange">答案</button>
+                    </div>
+                    <div id="hintDisplay" class="h-8 text-2xl font-bold text-theme-main mb-4 tracking-widest font-pinyin"></div>
+
+                    <div class="w-full max-w-2xl glass-panel p-6 md:p-8 bg-white/90 relative overflow-visible mx-auto">
+                        <div class="absolute -right-10 -bottom-10 text-9xl opacity-5 pointer-events-none rotate-12">⌨️</div>
+                        <div class="flex flex-col items-center w-full">
+                            <div class="relative w-full max-w-[400px] mb-5">
+                                <input id="pinyinInput" type="text" class="input-pill w-full px-4 py-3 text-2xl md:text-3xl text-center font-bold text-gray-700 tracking-wide" placeholder="輸入拼音..." autocomplete="off">
+                                <button onclick="checkAnswer()" class="btn-circle-confirm absolute -right-16 top-1/2 transform -translate-y-1/2" title="確認">✓</button>
+                            </div>
+                            <div class="flex justify-center gap-3 w-full max-w-[340px]">
+                                <button onclick="addTone(1)" class="tone-btn tone-1" title="一聲">¯</button>
+                                <button onclick="addTone(2)" class="tone-btn tone-2" title="二聲">ˊ</button>
+                                <button onclick="addTone(3)" class="tone-btn tone-3" title="三聲">ˇ</button>
+                                <button onclick="addTone(4)" class="tone-btn tone-4" title="四聲">ˋ</button>
+                                <button onclick="addTone(5)" class="tone-btn tone-5" title="輕聲">˙</button>
+                            </div>
+                            <div class="text-center text-gray-400 text-sm font-medium mt-3 mb-2">💡 也可以用鍵盤數字 1-5 輸入聲調喔！</div>
+                        </div>
+                        <div id="feedback" class="text-center h-10 flex items-center justify-center font-pinyin"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 結算畫面 -->
+        <div id="resultScreen" class="hidden min-h-screen flex items-center justify-center p-4 z-50 fixed inset-0 bg-sky-200/80 backdrop-blur-md">
+            <div class="glass-panel max-w-3xl w-full p-8 text-center relative animate-pop border-4 border-white">
+                <div class="absolute -top-14 left-1/2 transform -translate-x-1/2 text-8xl animate-bounce-soft drop-shadow-xl">🎉</div>
+                <h2 class="text-4xl text-theme-main mb-3 mt-10 font-bold">練習完成！</h2>
+                <p class="text-gray-500 mb-8 text-xl font-medium">小朋友真棒，來看看成績吧！</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+                    <div class="stat-card"><div class="stat-value text-gray-600" id="resultTime">00:00</div><div class="stat-label">所用時間</div></div>
+                    <div class="stat-card"><div class="stat-value text-red-500" id="resultWrong">0</div><div class="stat-label">答錯次數</div></div>
+                    <div class="stat-card"><div class="stat-value text-yellow-500" id="resultCombo">0</div><div class="stat-label">最大連擊</div></div>
+                    <div class="stat-card"><div class="stat-value text-green-500" id="resultAccuracy">0%</div><div class="stat-label">準確率</div></div>
+                    <div class="stat-card border-theme-main border-2 bg-blue-50"><div class="stat-value text-theme-main" id="resultScore">0</div><div class="stat-label">總分</div></div>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <button onclick="submitScore()" class="btn-3d btn-primary w-full py-4 text-xl shadow-lg">📤 提交給老師</button>
+                    <div class="flex gap-4">
+                        <button onclick="restartPractice()" class="btn-3d btn-green flex-1 py-3 text-lg">🔄 再玩一次</button>
+                        <button onclick="backToMenu()" class="btn-3d bg-gray-100 text-gray-600 shadow-[0_4px_0_#cbd5e1] border border-gray-200 flex-1 py-3 text-lg rounded-full hover:bg-gray-200">🏠 回主選單</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通用提示框 -->
+        <div id="customModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[60]">
+            <div class="glass-panel p-8 max-w-md w-full mx-4 text-center transform scale-100 transition-all animate-pop bg-white shadow-2xl border-2 border-white">
+                <div class="text-6xl mb-4 animate-bounce-soft">🔔</div>
+                <div id="modalMessage" class="text-xl font-bold text-gray-700 mb-8 leading-relaxed"></div>
+                <button id="modalConfirm" class="btn-3d btn-primary w-full py-3 text-xl">知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 變數與設置 ---
+        let globalVolume = 0.3;
+        let isMusicPlaying = false;
+        let currentMode = '';
+        let currentQuestion = 0;
+        let questions = [];
+        let combo = 0;
+        let maxCombo = 0;
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+        let startTime = Date.now();
+        let timer = null;
+        let hintUsed = false;
+        let selectedGrade = 0;
+
+        // --- 音效管理器 ---
+        const SoundManager = {
+            ctx: null,
+            init: function() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            playTone: function(freq, type, duration, vol = 0.1) {
+                if (!this.ctx) this.init();
+                if (globalVolume <= 0) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                // 提高基礎音量倍率，確保音量調整明顯
+                const adjustedVol = vol * globalVolume * 3; 
+                gain.gain.setValueAtTime(adjustedVol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            },
+            playClick: function() { this.playTone(600, 'sine', 0.1, 0.05); },
+            playType: function() {
+                if (!this.ctx) this.init();
+                if (globalVolume <= 0) return;
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.frequency.setValueAtTime(800, t);
+                osc.frequency.exponentialRampToValueAtTime(100, t + 0.05);
+                // 提高打字音效的基礎音量
+                gain.gain.setValueAtTime(0.05 * globalVolume * 3, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(t + 0.05);
+            },
+            playCorrect: function() {
+                setTimeout(() => this.playTone(523.25, 'sine', 0.3, 0.1), 0);
+                setTimeout(() => this.playTone(659.25, 'sine', 0.3, 0.1), 100);
+                setTimeout(() => this.playTone(783.99, 'sine', 0.4, 0.1), 200);
+            },
+            playWrong: function() {
+                this.playTone(150, 'sawtooth', 0.3, 0.05);
+                setTimeout(() => this.playTone(100, 'sawtooth', 0.3, 0.05), 100);
+            },
+            playFanfare: function() {
+                [523, 659, 783, 1046, 783, 1046].forEach((freq, i) => {
+                    setTimeout(() => this.playTone(freq, 'square', 0.2, 0.05), i * 150);
+                });
+            }
+        };
+
+        // --- 音樂控制 ---
+        function toggleMusic() {
+            const bgm = document.getElementById('bgmAudio');
+            const btn = document.getElementById('musicToggle');
+            const iconPath = document.getElementById('musicIconPath');
+            
+            if (isMusicPlaying) {
+                bgm.pause();
+                btn.classList.remove('playing');
+                iconPath.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+            } else {
+                SoundManager.init(); 
+                bgm.play().catch(e => console.log("Autoplay prevented", e));
+                btn.classList.add('playing');
+                iconPath.setAttribute('d', 'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z');
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+        function adjustVolume(value, isInteraction = false) {
+            const vol = parseFloat(value);
+            globalVolume = vol;
+            
+            // 1. 設定背景音樂音量
+            const bgm = document.getElementById('bgmAudio');
+            if (bgm) bgm.volume = vol;
+
+            // 2. 嘗試喚醒 AudioContext (解決瀏覽器限制)
+            if (SoundManager.ctx && SoundManager.ctx.state === 'suspended') {
+                SoundManager.ctx.resume();
+            }
+
+            // 3. 如果是拖曳結束(放開滑鼠)，且音樂沒在播，播放一個提示音確認音量
+            if (isInteraction && !isMusicPlaying) {
+                SoundManager.init();
+                SoundManager.playClick();
+            }
+        }
+
+        // --- 初始化 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const bgm = document.getElementById('bgmAudio');
+            const slider = document.getElementById('volumeSlider');
+            if (bgm && slider) {
+                const initialVol = parseFloat(slider.value);
+                bgm.volume = initialVol;
+                globalVolume = initialVol;
+            }
+
+            const container = document.getElementById('particlesContainer');
+            const chars = ['a', 'o', 'e', 'i', 'u', 'ü', 'b', 'p', 'm', 'f', 'd', 't', 'n', 'l', 'g', 'k', 'h'];
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.textContent = chars[Math.floor(Math.random() * chars.length)];
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                const duration = Math.random() * 10 + 15;
+                const delay = Math.random() * -20;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                container.appendChild(particle);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button') || e.target.closest('.grade-card')) {
+                SoundManager.playClick();
+            }
+        });
+
+        // --- 數據庫 ---
+        // 學生資料 (簡化顯示)
+        const studentDatabase = {
+            "1A": [{ id: 1, name: "MARCUS" }, { id: 2, name: "劉文偉" }, { id: 3, name: "洪愷奕" }, { id: 4, name: "洪榆淇" }, { id: 5, name: "SHIVAM" }, { id: 6, name: "GIO" }, { id: 7, name: "李俊言" }, { id: 8, name: "李凱寧" }, { id: 9, name: "ALAZNE" }, { id: 10, name: "梁家緣" }, { id: 11, name: "CHIKO" }, { id: 12, name: "蘇杰文" }, { id: 13, name: "PRINCESS" }, { id: 14, name: "SOPHIA" }, { id: 15, name: "LEON" }, { id: 16, name: "STAR" }, { id: 17, name: "鍾紫慧" }, { id: 18, name: "姚竣喆" }],
+            "2A": [{ id: 1, name: "陳雲凡" }, { id: 2, name: "張喆" }, { id: 3, name: "鄧祈峰" }, { id: 4, name: "樊奕辰" }, { id: 5, name: "付哲銘" }, { id: 6, name: "侯棋涵" }, { id: 7, name: "胡佳睿" }, { id: 8, name: "林嘉欣" }, { id: 9, name: "李倪森" }, { id: 10, name: "李晉博" }, { id: 11, name: "勞振謙" }, { id: 12, name: "AMANDA" }, { id: 13, name: "MEHRAB" }, { id: 14, name: "吳竣杰" }, { id: 15, name: "MRIJU" }, { id: 16, name: "王泓權" }, { id: 17, name: "俞家豪" }, { id: 18, name: "張子涵" }],
+            "3A": [{ id: 1, name: "陳玥辰" }, { id: 2, name: "陳韵鈴" }, { id: 3, name: "陳澤涵" }, { id: 4, name: "KEEFE" }, { id: 5, name: "洪愷霖" }, { id: 6, name: "洪榆林" }, { id: 7, name: "柯瑾蓉" }, { id: 8, name: "林子揚" }, { id: 9, name: "李凱晴" }, { id: 10, name: "李凱嵐" }, { id: 11, name: "李詩倪" }, { id: 12, name: "林瑾萱" }, { id: 13, name: "劉世燦" }, { id: 14, name: "AARIAN" }, { id: 15, name: "譚祉睿" }, { id: 16, name: "唐詩晴" }, { id: 17, name: "佟語哲" }, { id: 18, name: "曾俊燁" }, { id: 19, name: "王梓淇" }, { id: 20, name: "胡苡娜" }, { id: 21, name: "顏鴻集" }, { id: 22, name: "楊君彥" }, { id: 23, name: "余瑞霖" }, { id: 24, name: "ZAYAN" }, { id: 25, name: "馬浩峰" }],
+            "4A": [{ id: 1, name: "CARLO" }, { id: 2, name: "安祉墨" }, { id: 3, name: "KEIRA" }, { id: 4, name: "曹薛恒" }, { id: 5, name: "陳熙媛" }, { id: 6, name: "鄒焯霖" }, { id: 7, name: "鄭仲恩" }, { id: 8, name: "鄭仲軒" }, { id: 9, name: "張國鋒" }, { id: 10, name: "SEBASTIAN" }, { id: 11, name: "ZOE" }, { id: 12, name: "方柏喬" }, { id: 13, name: "方佩芸" }, { id: 14, name: "劉竣柏" }, { id: 15, name: "李曉亮" }, { id: 16, name: "林承宇" }, { id: 17, name: "劉小菲" }, { id: 18, name: "ZOYA" }, { id: 19, name: "黃俊皓" }, { id: 20, name: "吳梓曦" }, { id: 21, name: "邱振航" }, { id: 22, name: "楊鎧霖" }, { id: 23, name: "葉孝莉" }, { id: 24, name: "張堡鈞" }, { id: 25, name: "張棕盛" }],
+            "5A": [{ id: 1, name: "歐芷睿" }, { id: 2, name: "PAIGE" }, { id: 3, name: "蔡梓晴" }, { id: 4, name: "CERAH" }, { id: 5, name: "陳芮綺" }, { id: 6, name: "戴佩珊" }, { id: 7, name: "DON" }, { id: 8, name: "董宸悅" }, { id: 9, name: "高滿" }, { id: 10, name: "龔欣桐" }, { id: 11, name: "黃岳麒" }, { id: 12, name: "許琮鑫" }, { id: 13, name: "ADRYLL" }, { id: 14, name: "王君樂彥" }, { id: 15, name: "林宇晟" }, { id: 16, name: "盧穎欣" }, { id: 17, name: "盧唐那" }, { id: 18, name: "羅家良" }, { id: 19, name: "JADEN" }, { id: 20, name: "SAROSH" }, { id: 21, name: "施家儀" }, { id: 22, name: "王筱淇" }, { id: 23, name: "葉邇高" }, { id: 24, name: "張予涵" }, { id: 25, name: "ZIANA" }],
+            "5B": [{ id: 1, name: "卞俊壹" }, { id: 2, name: "蔡梓鑫" }, { id: 3, name: "陳坷凡" }, { id: 4, name: "陳絲悅" }, { id: 5, name: "鄒焯恆" }, { id: 6, name: "張南鈺" }, { id: 7, name: "高鼎盛" }, { id: 8, name: "許恒銘" }, { id: 9, name: "胡銳華" }, { id: 10, name: "黃岳麟" }, { id: 11, name: "李奕謙" }, { id: 12, name: "柳博文" }, { id: 13, name: "邵海悅" }, { id: 14, name: "施愷煜" }, { id: 15, name: "施巧雯" }, { id: 16, name: "曾子陽" }, { id: 17, name: "韋詠蕎" }, { id: 18, name: "王鏡宇" }, { id: 19, name: "王梓賢" }, { id: 20, name: "王啟航" }, { id: 21, name: "吳鎂汐" }, { id: 22, name: "翁鈺涵" }, { id: 23, name: "鄭奕鍚" }],
+            "6A": [{ id: 1, name: "蔡榮軒" }, { id: 2, name: "陳文璽" }, { id: 3, name: "張君城" }, { id: 4, name: "周雪喬" }, { id: 5, name: "韓蔡育" }, { id: 6, name: "柯瑾瑄" }, { id: 7, name: "BIBI" }, { id: 8, name: "DIKSHITA" }, { id: 9, name: "賴曉琦" }, { id: 10, name: "林羽萱" }, { id: 11, name: "羅星宇" }, { id: 12, name: "馬卓熙" }, { id: 13, name: "JACOB" }, { id: 14, name: "佘浩銘" }, { id: 15, name: "施筱淇" }, { id: 16, name: "施鈞燁" }, { id: 17, name: "施振雄" }, { id: 18, name: "王嘉欣" }, { id: 19, name: "王聖淵" }, { id: 20, name: "黃俊豪" }, { id: 21, name: "吳琦淮" }, { id: 22, name: "吳雅恩" }, { id: 23, name: "許佳琳" }, { id: 24, name: "GRACE" }],
+            "6B": [{ id: 1, name: "陳樂晴" }, { id: 2, name: "陳叶信" }, { id: 3, name: "莊家豪" }, { id: 4, name: "鍾祉瑩" }, { id: 5, name: "龍悅明" }, { id: 6, name: "黃菲菲" }, { id: 7, name: "葉睿庭" }, { id: 8, name: "李柏煒" }, { id: 9, name: "李偉豪" }, { id: 10, name: "李亦善" }, { id: 11, name: "林靖彌" }, { id: 12, name: "吳鎮賢" }, { id: 13, name: "吳議樂" }, { id: 14, name: "柯琬婷" }, { id: 15, name: "曾駿熙" }, { id: 16, name: "翁銘鑫" }, { id: 17, name: "王鑫達" }, { id: 18, name: "吳東翰" }, { id: 19, name: "顏榮駿" }]
+        };
+
+        // 詞彙與句子數據 (使用原始數據)
+        const vocabularyByGrade = {
+            1: ['我', '你', '他', '她', '它', '媽媽', '爸爸', '爺爺', '奶奶', '姐姐', '哥哥', '弟弟', '妹妹', '家', '房子', '門', '窗', '床', '桌子', '椅子', '水', '火', '山', '河', '太陽', '月亮', '星星', '天空', '雲', '雨', '雪', '風', '樹', '花', '草', '鳥', '魚', '狗', '貓', '牛', '馬', '羊', '雞', '鴨', '豬', '人', '男', '女', '老', '小', '大', '高', '矮', '胖', '瘦', '好', '壞', '美', '醜', '新', '舊', '多', '少', '熱', '冷', '快', '慢', '上', '下', '左', '右', '前', '後', '裡', '外', '東', '南', '西', '北', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '百', '千', '萬', '紅', '黃', '藍', '綠', '白', '黑', '吃', '喝', '睡', '走', '跑', '跳', '看', '聽', '說', '讀', '寫', '學', '教'],
+            2: ['包', '被子', '不敢', '差點兒', '傳統', '刺激', '打算', '當', '燈謎', '叠', '豆腐腦兒', '肚子', '餓', '房間', '丰富', '干淨', '過山車', '海洋公園', '盒', '花燈', '滑梯', '幾動遊戲', '繼續', '獎品', '金魚', '進步', '可愛', '塊', '老鼠', '梨', '溜', '買', '賣', '芒果', '毛', '努力', '爬', '攀登架', '碰碰車', '葡萄干兒', '骑', '起床', '錢', '秋千', '賞月', '收拾', '叔叔', '刷牙', '水果', '睡覺', '特別', '五彩', '喜歡', '洗臉', '小丑', '旋轉木馬', '楊桃', '搖搖馬', '衣服', '遊樂場', '有趣', '柚子', '月餅', '贊成', '早晚', '怎麼', '芝麻麵包', '中秋節', '主意', '注意', '準時', '老師', '同學', '朋友', '學校', '教室', '黑板', '課本', '作業', '考試', '學習', '知識', '智慧', '勤奮', '認真', '仔細', '書包', '鉛筆', '橡皮', '尺子', '文具', '紙張', '蘋果', '香蕉', '橘子', '葡萄', '西瓜', '草莓', '桃子', '梨子', '小狗', '小貓', '小鳥', '蝴蝶', '蜜蜂', '螞蟻', '蚯蚓', '金魚', '烏龜', '兔子', '熊貓', '獅子', '老虎', '大象', '長頸鹿', '猴子', '太陽', '月亮', '星星', '彩虹', '花朵', '樹木', '小草', '森林', '公園', '操場', '游泳池', '圖書館', '早上', '中午', '晚上', '昨天', '今天', '明天', '春天', '夏天', '秋天', '冬天', '溫暖', '涼爽', '炎熱', '寒冷', '晴天', '陰天', '雨天', '雪天', '快樂', '高興', '開心', '興奮', '滿意', '幸福', '健康', '平安', '成功', '優秀', '聰明', '美麗', '漂亮', '乾淨', '整潔', '安靜', '熱鬧', '歡迎', '感謝', '再見', '早安', '晚安'],
+            3: ['安排', '按時', '辦', '幫', '報名', '比賽', '邊', '表情', '表演', '不錯', '補', '備置', '彩條兒', '參加', '茶葉蛋', '帶', '燈籠', '對不起', '放鬆', '告訴', '果凍兒', '話劇', '黃河', '交換', '教練', '教室', '節目', '緊張', '進步', '就是', '可是', '客氣', '口信兒', '藍球', '禮物', '聯歡會', '聊', '沒問題', '明天', '慶祝', '圈', '如果', '三明治', '上班', '聖誕', '手機', '提醒', '體育', '忘記', '效果', '心意卡', '許多', '學期', '邀請', '要不是', '一定', '以後', '一直', '原來', '原諒', '自然', '知道', '只管', '主題公園', '專心', '轉告', '足球', '昨天', '電腦', '電視', '相機', '音響', '冰箱', '洗衣機', '微波爐', '汽車', '自行車', '摩托車', '火車', '飛機', '輪船', '地鐵', '公車', '計程車', '醫院', '診所', '藥局', '銀行', '郵局', '超市', '商店', '餐廳', '咖啡店', '麵包店', '公園', '動物園', '博物館', '圖書館', '電影院', '遊樂園', '海邊', '山上', '鄉下', '城市', '國家', '世界', '地球', '宇宙', '春天', '夏天', '秋天', '冬天', '節日', '生日', '新年', '聖誕節', '中秋節', '端午節', '健康', '生病', '感冒', '發燒', '頭痛', '肚子痛', '安全', '危險', '小心', '注意', '友愛', '關心', '幫助', '合作', '分享', '勇敢', '害怕', '緊張', '誠實', '謊言', '禮貌', '粗魯', '聰明', '笨拙', '努力', '懶惰', '認真', '馬虎', '團隊', '個人', '活動', '遊戲', '運動', '籃球', '桌球', '游泳', '跑步', '跳舞', '唱歌', '畫畫', '閱讀', '寫作', '數學', '科學', '歷史', '地理', '音樂', '美術'],
+            4: ['愛護', '白帆', '拜', '不要緊', '菜田', '草', '沉', '廚房', '床鋪', '打掃', '大概', '待勁兒', '蛋漿', '得', '動物', '風景', '扶手', '改天', '幹活兒', '光想想', '鍋', '果園', '好玩兒', '蝴蝶', '幾乎人', '家務', '攪拌', '接著', '苦瓜', '誇', '昆蟲', '垃圾', '辣椒', '老爺爺', '綠樹', '亂來', '亂糟糟', '麻婆豆腐', '買菜', '那麼', '鬧', '你們倆', '鳥語花香', '濃香', '漂亮', '瞧', '清淡', '清新', '青山', '掃地', '砂糖', '山頂', '收拾', '梳毛', '說不定', '酸甜苦辣', '台階', '糖醋魚', '跳來跳去', '提', '兔子', '碗', '握緊', '吸塵', '下車', '夏天', '蜥蜴', '欣賞', '藥', '應該', '咱們', '照顧', '只有', '煮', '助手', '準保', '最後', '做飯', '環境', '保護', '污染', '清潔', '資源', '節約', '浪費', '回收', '分類', '科學', '技術', '發明', '創造', '研究', '實驗', '觀察', '記錄', '分析', '結論', '想像', '創意', '夢想', '目標', '計劃', '實現', '責任', '義務', '權利', '自由', '平等', '公平', '正義', '溝通', '交流', '討論', '爭論', '同意', '反對', '表達', '演講', '報告', '簡報', '關心', '理解', '包容', '寬恕', '文化', '傳統', '習俗', '風俗', '歷史', '古代', '現代', '未來', '創新', '變化', '發展', '進步', '改善', '節日', '慶祝', '紀念', '活動', '儀式', '典禮', '表演', '演出', '音樂', '舞蹈', '戲劇', '電影', '藝術', '繪畫', '雕塑', '書法', '運動', '競賽', '比賽', '勝利', '失敗', '成功', '挫折', '遊戲', '娛樂', '休閒', '閱讀', '學習', '知識', '智慧', '經驗', '技能'],
+            5: ['愛心', '安心', '保管', '筆筒', '博物館', '不分上下', '叉燒', '遲幫', '創作', '帶領', '等不及', '廢紙', '附近', '高處', '功夫', '購物', '鼓掌', '觀景台', '觀眾', '光盤', '逛逛', '耗電', '花瓶', '皇上', '回復', '幾乎', '機會', '計劃', '節約', '緊張', '盡興', '驚動', '景色', '覺得', '空調', '口號', '啦啦隊', '懶蟲', '浪費', '冷', '厲害', '歷史', '領先', '露出', '美食', '蜜汁', '摩拳擦掌', '能源', '飄揚', '乒乓球館', '任為', '撒腿', '少女', '身手', '似的', '摔倒', '水龍頭', '彈簧', '探望', '湯', '頑強', '圍巾', '溫度', '行程', '行李', '虛弱', '選手', '養病', '意識', '贊不絕口', '珍貴', '珍惜', '資源', '值得', '腫', '尊敬', '社會', '社區', '鄰居', '市民', '公民', '國家', '政府', '法律', '規則', '制度', '世界', '國際', '全球', '地球', '環球', '和平', '戰爭', '衝突', '合作', '競爭', '進步', '發展', '成長', '提升', '改進', '建設', '建造', '修建', '破壞', '毀滅', '改革', '變革', '革新', '創新', '發明', '發現', '探索', '研究', '調查', '分析', '學問', '學術', '理論', '實踐', '經驗', '知識', '智慧', '思想', '觀念', '理念', '品格', '品德', '道德', '倫理', '修養', '教養', '文明', '文化', '禮貌', '禮儀', '尊重', '敬愛', '崇拜', '欽佩', '包容', '寬容', '理解', '諒解', '同情', '憐憫', '溫暖', '溫馨', '親切', '友善', '關懷', '關愛', '愛護', '保護', '奉獻', '犧牲', '付出', '給予', '服務', '幫助', '協助', '支援', '貢獻', '成就', '成功', '勝利', '榮譽', '光榮', '驕傲', '自豪', '滿足', '快樂', '幸福', '美好', '完美', '理想', '希望', '夢想'],
+            6: ['拜訪', '搬遷', '保留', '畢畫', '參觀', '沉迷', '襯托', '承諾', '地標', '地貌', '典雅', '豐富多彩', '高樓林立', '估計', '後悔', '畫面', '迴避', '及格', '繼續', '建築物', '介紹', '盡力', '盡頭', '精美', '驚喜', '考慮', '了不起', '留念', '錄音', '忙忙碌碌', '冒昧', '沒準兒', '勉勵', '名勝', '難得', '凝固', '寧靜', '努力向上', '奇特', '氣不喘', '啟程', '敲', '侵蝕', '勸導', '勸誡', '饒恕', '篩選', '傷悲', '上網', '神奇', '時光', '時限', '搜集', '網絡遊戲', '唯一', '五彩繽紛', '鑲', '響亮', '幸好', '嚴重', '嚴柱', '眼光', '搖豔', '異曲同工', '猶豫', '約束', '責備', '展出', '昭顯', '著涼', '珍惜', '值得', '指點', '製作', '專題研習', '壯麗', '資料', '作品', '民主', '專制', '獨裁', '共和', '君主', '憲法', '議會', '選舉', '投票', '候選人', '自由', '限制', '解放', '獨立', '依賴', '平等', '不等', '公平', '偏私', '正義', '邪惡', '善良', '罪惡', '法治', '無法', '秩序', '混亂', '人權', '權力', '權威', '威嚴', '道德', '品德', '品格', '人格', '倫理', '倫常', '哲學', '思想', '理論', '學說', '主義', '觀點', '邏輯', '推理', '思考', '思維', '批判', '質疑', '懷疑', '相信', '分析', '綜合', '歸納', '演繹', '整合', '統一', '分離', '評估', '評價', '判斷', '決定', '選擇', '決策', '創意', '創新', '創造', '發明', '洞察', '觀察', '發現', '探索', '領導', '管理', '指揮', '組織', '協調', '影響', '感化', '啟發', '教育', '感動', '激勵', '鼓舞', '振奮', '堅持', '持續', '恆心', '毅力', '耐心', '忍耐', '決心', '意志', '信心', '勇氣', '理想', '抱負', '使命']
+        };
+
+        const sentencesByGrade = {
+            1: [{ text: '我很愛我的家。', topic: '家庭' }, { text: '天上的太陽很大。', topic: '自然' }, { text: '小鳥在天上飛。', topic: '動物' }, { text: '花園裡的花很美。', topic: '植物' }, { text: '我每天去上學。', topic: '學校' }, { text: '我的媽媽很好。', topic: '家人' }, { text: '爸爸每天去工作。', topic: '家人' }, { text: '河裡的水很清。', topic: '自然' }, { text: '那座山很高很高。', topic: '自然' }, { text: '我今天很快樂。', topic: '情感' }, { text: '同學們早上好！', topic: '老師早' }, { text: '老師您早！', topic: '老師早' }, { text: '我姓馬，是你們的班主任。', topic: '老師早' }, { text: '馬老師，您好！', topic: '老師早' }, { text: '我是王小波。', topic: '我們這一班' }, { text: '我叫張美娜。', topic: '我們這一班' }, { text: '我叫何嘉麗。你今年幾歲？', topic: '我們這一班' }, { text: '我今年六歲。', topic: '我們這一班' }, { text: '我有一個弟弟。', topic: '家人' }, { text: '我們一起去公園。', topic: '日常活動' }, { text: '小貓在家裡睡覺。', topic: '動物' }, { text: '我喜歡吃蘋果。', topic: '日常生活' }, { text: '下雨了，要帶傘。', topic: '自然' }, { text: '我的書包是紅色的。', topic: '學校' }, { text: '你家有幾口人？', topic: '我的家人' }, { text: '爸爸媽媽哥哥和我。', topic: '我的家人' }, { text: '我家有五口人。', topic: '我的家人' }, { text: '今天是幾月幾號？', topic: '今天有件大事' }, { text: '是外婆的生日。', topic: '今天有件大事' }, { text: '晚上我們去慶祝。', topic: '今天有件大事' }, { text: '我要送賀卡給外婆。', topic: '今天有件大事' }, { text: '你知道嘉麗在哪裏？', topic: '圖書館在哪裏' }, { text: '嘉麗在圖書館。', topic: '圖書館在哪裏' }, { text: '圖書館在哪一層？', topic: '圖書館在哪裏' }, { text: '在三樓旁邊。', topic: '圖書館在哪裏' }, { text: '謝謝你告訴我。', topic: '圖書館在哪裏' }, { text: '一年級有幾個班？', topic: '我們的班級' }, { text: '五個班在一樓。', topic: '我們的班級' }, { text: '學校有幾層樓？', topic: '我們的班級' }, { text: '有六層樓高。', topic: '我們的班級' }, { text: '你的鞋帶鬆了！', topic: '你真棒' }, { text: '我不會繫鞋帶。', topic: '你真棒' }, { text: '我會我幫你。', topic: '你真棒' }, { text: '你真棒真好！', topic: '你真棒' }, { text: '祝你生日快樂！', topic: '生日願望' }, { text: '謝謝你媽媽。', topic: '生日願望' }, { text: '我要學會繫鞋帶。', topic: '生日願望' }, { text: '好我來教你。', topic: '生日願望' }, { text: '我老是接不到球。', topic: '你也做得到' }, { text: '放鬆眼睛盯著球！', topic: '你也做得到' }, { text: '我要把球接住！', topic: '你也做得到' }, { text: '接到了你真行！', topic: '你也做得到' }],
+            2: [{ text: '老師在教室裡上課。', topic: '學校生活' }, { text: '媽媽做飯很香。', topic: '家庭生活' }, { text: '小狗在公園玩耍。', topic: '動物' }, { text: '蘋果又紅又甜。', topic: '水果' }, { text: '我和朋友一起畫畫。', topic: '日常活動' }, { text: '春天的花很美麗。', topic: '季節' }, { text: '同學們一起做作業。', topic: '學習' }, { text: '圖書館有很多書。', topic: '閱讀' }, { text: '運動讓身體健康。', topic: '健康' }, { text: '我喜歡聽音樂。', topic: '興趣' }, { text: '今天是我的生日。', topic: '日常生活' }, { text: '我有一個好朋友。', topic: '友誼' }, { text: '爸爸帶我去動物園。', topic: '家庭活動' }, { text: '小貓喜歡喝牛奶。', topic: '動物' }, { text: '下雨了要帶雨傘。', topic: '天氣' }, { text: '我每天早上刷牙洗臉。', topic: '日常習慣' }, { text: '公園裡有很多小朋友。', topic: '戶外活動' }, { text: '媽媽給我做了好吃的麵條。', topic: '家庭生活' }, { text: '弟弟在玩玩具汽車。', topic: '家人' }, { text: '老師教我們寫字。', topic: '學校生活' }, { text: '我喜歡看故事書。', topic: '閱讀' }, { text: '夏天很熱要多喝水。', topic: '季節' }, { text: '我會自己穿衣服。', topic: '生活技能' }, { text: '奶奶給我講故事。', topic: '家人' }, { text: '同學生病了我去看他。', topic: '友愛' }, { text: '秋天的樹葉黃了。', topic: '季節' }, { text: '我幫媽媽收拾房間。', topic: '家務' }, { text: '小鳥在樹上唱歌。', topic: '自然' }, { text: '冬天下雪了真好玩。', topic: '季節' }, { text: '我和姐姐一起做功課。', topic: '學習' }, { text: '爺爺每天早上去公園運動。', topic: '家人' }, { text: '我學會了騎自行車。', topic: '成長' }, { text: '教室裡的黑板很大。', topic: '學校' }, { text: '水果很好吃也很健康。', topic: '飲食' }, { text: '我喜歡畫畫和唱歌。', topic: '興趣' }, { text: '媽媽說要早睡早起。', topic: '生活習慣' }, { text: '小魚在水裡游來游去。', topic: '動物' }, { text: '我們一起玩遊戲很開心。', topic: '遊戲' }, { text: '老師說我今天表現很好。', topic: '學校' }, { text: '花園裡的花開了很漂亮。', topic: '植物' }, { text: '哥哥在寫作業我也要認真。', topic: '學習' }, { text: '早上的太陽很溫暖。', topic: '自然' }, { text: '我要做一個乖孩子。', topic: '品格' }, { text: '小兔子的耳朵很長。', topic: '動物' }, { text: '媽媽買了新書包給我。', topic: '家庭' }, { text: '我喜歡和朋友一起玩。', topic: '友誼' }, { text: '下課了大家都很高興。', topic: '學校' }, { text: '晚上我們全家一起吃飯。', topic: '家庭' }, { text: '我會說謝謝和對不起。', topic: '禮貌' }, { text: '小草綠綠的真可愛。', topic: '植物' }, { text: '爸爸教我騎車要小心。', topic: '安全' }, { text: '我愛我的家人。', topic: '家庭' }, { text: '天上的雲像棉花糖。', topic: '自然' }, { text: '我要好好學習天天向上。', topic: '學習態度' }, { text: '妹妹笑起來很可愛。', topic: '家人' }, { text: '學校的操場很大。', topic: '學校' }, { text: '我喜歡吃媽媽做的飯。', topic: '家庭' }, { text: '朋友之間要互相幫助。', topic: '友誼' }, { text: '月亮晚上出來了。', topic: '自然' }],
+            3: [{ text: '春天來了,花園裡的花都開了。', topic: '自然季節' }, { text: '我們要保護環境,愛護地球。', topic: '環保教育' }, { text: '同學生病了,我們去看他。', topic: '友愛關懷' }, { text: '圖書館裡有很多有趣的書。', topic: '學習閱讀' }, { text: '運動讓我們身體更健康。', topic: '健康生活' }, { text: '科學實驗很有趣,我們學到很多。', topic: '科學學習' }, { text: '團隊合作能完成更困難的任務。', topic: '合作精神' }, { text: '誠實是最重要的品格。', topic: '品德教育' }, { text: '每個人都有自己的夢想。', topic: '理想抱負' }, { text: '文化傳統需要我們傳承。', topic: '文化傳承' }, { text: '老師教我們要尊重別人。', topic: '品德教育' }, { text: '我喜歡參加學校的活動。', topic: '學校生活' }, { text: '中秋節我們一起賞月吃月餅。', topic: '傳統節日' }, { text: '下雨天記得帶雨傘和雨衣。', topic: '日常生活' }, { text: '媽媽教我做家務要認真。', topic: '家庭教育' }, { text: '同學之間要友愛互助。', topic: '人際關係' }, { text: '我最喜歡的科目是美術。', topic: '學習興趣' }, { text: '公園裡的樹木長得很茂盛。', topic: '自然觀察' }, { text: '爸爸說做事要有耐心。', topic: '品格培養' }, { text: '我們班級獲得了整潔獎。', topic: '集體榮譽' }, { text: '圖書館是學習的好地方。', topic: '學習環境' }, { text: '春節是中國最重要的節日。', topic: '文化傳統' }, { text: '每天要做好自己的功課。', topic: '學習態度' }, { text: '小朋友要愛護公共設施。', topic: '公民意識' }, { text: '我學會了游泳很開心。', topic: '運動技能' }, { text: '爺爺給我講了很多有趣的故事。', topic: '家庭活動' }, { text: '秋天是收穫的季節。', topic: '季節變化' }, { text: '我們要節約用水用電。', topic: '環保意識' }, { text: '誠實守信是做人的基本。', topic: '品德修養' }, { text: '課堂上要認真聽講。', topic: '學習習慣' }, { text: '媽媽做的菜很好吃。', topic: '家庭生活' }, { text: '我幫助同學解決了難題。', topic: '助人為樂' }, { text: '動物園裡有很多可愛的動物。', topic: '遊覽體驗' }, { text: '星期天我們全家去爬山。', topic: '家庭活動' }, { text: '老師表揚我作業寫得好。', topic: '學習表現' }, { text: '冬天要注意保暖。', topic: '生活常識' }, { text: '我最喜歡看童話故事書。', topic: '閱讀興趣' }, { text: '運動會上我們班得了第一名。', topic: '體育活動' }, { text: '植物需要陽光和水才能生長。', topic: '科學知識' }, { text: '我學會了關心別人。', topic: '情感教育' }, { text: '過馬路要看紅綠燈。', topic: '安全教育' }, { text: '弟弟妹妹都很聽話。', topic: '家庭關係' }, { text: '我要做一個有禮貌的孩子。', topic: '禮儀教育' }, { text: '學校的花園很漂亮。', topic: '校園環境' }, { text: '大家一起打掃教室。', topic: '勞動實踐' }, { text: '我喜歡和朋友分享快樂。', topic: '友誼分享' }, { text: '老師說要珍惜時間。', topic: '時間管理' }, { text: '夏天的夜晚有很多星星。', topic: '自然景觀' }, { text: '我會彈鋼琴了。', topic: '才藝學習' }, { text: '幫助別人是一件快樂的事。', topic: '助人精神' }, { text: '爸爸媽媽工作很辛苦。', topic: '感恩教育' }, { text: '圖書館的書要愛護。', topic: '公德意識' }, { text: '我們要保護小動物。', topic: '愛護生命' }, { text: '學習新知識很有趣。', topic: '學習樂趣' }, { text: '端午節要吃粽子。', topic: '傳統習俗' }, { text: '我學會了騎自行車。', topic: '技能掌握' }, { text: '同學生日我送了賀卡。', topic: '友誼表達' }],
+            4: [{ text: '科學家發明了許多有用的東西。', topic: '科學技術' }, { text: '團隊合作可以完成更大的事情。', topic: '合作精神' }, { text: '我們要學會表達自己的想法。', topic: '溝通表達' }, { text: '傳統文化是祖先留下的寶貴遺產。', topic: '文化傳承' }, { text: '每個人都有自己的夢想和目標。', topic: '理想抱負' }, { text: '環境保護是每個人的責任。', topic: '環保意識' }, { text: '創新思維能帶來新的可能性。', topic: '創新思考' }, { text: '溝通是解決問題的重要方法。', topic: '人際關係' }, { text: '歷史告訴我們過去的智慧。', topic: '歷史學習' }, { text: '藝術能豐富我們的精神生活。', topic: '藝術欣賞' }, { text: '中國有五千年的悠久歷史。', topic: '歷史文化' }, { text: '長城是中華民族的驕傲。', topic: '文化遺產' }, { text: '春節是中國最重要的傳統節日。', topic: '傳統節日' }, { text: '詩詞歌賦是中華文化的瑰寶。', topic: '文學藝術' }, { text: '尊老愛幼是中華民族的美德。', topic: '傳統美德' }, { text: '黃河是中華民族的母親河。', topic: '地理知識' }, { text: '保護環境人人有責。', topic: '環保意識' }, { text: '勤勞勇敢是中華民族的優良傳統。', topic: '民族精神' }, { text: '學習要刻苦努力持之以恆。', topic: '學習態度' }, { text: '誠信是做人的根本。', topic: '品德修養' }, { text: '四大發明改變了世界歷史。', topic: '科技成就' }, { text: '團結就是力量。', topic: '集體精神' }, { text: '我們要珍惜糧食不浪費。', topic: '節約美德' }, { text: '助人為樂是一種美好的品質。', topic: '道德品質' }, { text: '孝敬父母是我們的責任。', topic: '家庭倫理' }, { text: '書是人類進步的階梯。', topic: '讀書學習' }, { text: '失敗是成功之母。', topic: '人生哲理' }, { text: '虛心使人進步驕傲使人落後。', topic: '學習態度' }, { text: '有志者事竟成。', topic: '勵志格言' }, { text: '朋友之間要以誠相待。', topic: '友誼交往' }, { text: '保護野生動物是我們的責任。', topic: '環保意識' }, { text: '中國的戲曲藝術源遠流長。', topic: '傳統藝術' }, { text: '節約用水從我做起。', topic: '環保行動' }, { text: '尊重他人就是尊重自己。', topic: '待人之道' }, { text: '古人留下了許多寶貴的智慧。', topic: '歷史智慧' }, { text: '我們要學會感恩。', topic: '情感教育' }, { text: '遵守交通規則保障生命安全。', topic: '安全教育' }, { text: '堅持不懈才能取得成功。', topic: '成功之道' }, { text: '中華美食享譽世界。', topic: '飲食文化' }, { text: '保護文物就是保護歷史。', topic: '文物保護' }, { text: '良好的習慣成就美好人生。', topic: '行為習慣' }, { text: '我們要愛護公共財物。', topic: '公民意識' }, { text: '勤儉節約是傳統美德。', topic: '節儉美德' }, { text: '寬容是一種美德。', topic: '品德修養' }, { text: '責任心是成長的基石。', topic: '責任教育' }, { text: '中國的山水畫藝術獨特。', topic: '藝術欣賞' }, { text: '讀萬卷書行萬里路。', topic: '學習方法' }, { text: '時間就是生命。', topic: '珍惜時間' }, { text: '知識改變命運。', topic: '學習重要性' }, { text: '團結合作共創輝煌。', topic: '團隊精神' }, { text: '我們要做一個有理想的人。', topic: '人生理想' }, { text: '保護地球就是保護我們的家園。', topic: '環保意識' }, { text: '自信是成功的第一步。', topic: '心理素質' }, { text: '中國的書法藝術博大精深。', topic: '傳統藝術' }, { text: '我們要學會獨立思考。', topic: '思維能力' }, { text: '愛國是每個公民的責任。', topic: '愛國教育' }],
+            5: [{ text: '知識是人類進步的階梯和動力。', topic: '學習成長' }, { text: '我們要用智慧解決生活中的問題。', topic: '智慧思考' }, { text: '尊重別人的意見是很重要的品格。', topic: '品格修養' }, { text: '社會需要每個人都盡自己的責任。', topic: '社會責任' }, { text: '創新思維能夠帶來更美好的未來。', topic: '創新發展' }, { text: '全球化讓世界變得更加緊密連結。', topic: '國際視野' }, { text: '科技發展改變了人類的生活方式。', topic: '科技影響' }, { text: '文化多樣性豐富了人類的精神世界。', topic: '文化理解' }, { text: '環境永續發展關係到未來世代。', topic: '永續發展' }, { text: '教育是國家發展的重要基石。', topic: '教育重要' }, { text: '中華文明是世界四大文明之一。', topic: '歷史文明' }, { text: '科技創新推動社會進步。', topic: '科技發展' }, { text: '讀書可以開闊視野增長見識。', topic: '閱讀價值' }, { text: '責任感是一個人成熟的標誌。', topic: '品格成長' }, { text: '合作精神在現代社會越來越重要。', topic: '團隊合作' }, { text: '環境污染問題需要全人類共同解決。', topic: '環保問題' }, { text: '誠實守信是立身之本。', topic: '道德品質' }, { text: '學習方法比努力更重要。', topic: '學習策略' }, { text: '批判性思維幫助我們辨別是非。', topic: '思維能力' }, { text: '文化交流促進世界和平。', topic: '文化交流' }, { text: '自律是成功的關鍵因素。', topic: '自我管理' }, { text: '孝道是中華民族的傳統美德。', topic: '傳統美德' }, { text: '閱讀經典作品提升文化素養。', topic: '文化修養' }, { text: '節能減排保護地球家園。', topic: '環保行動' }, { text: '團隊協作能力決定事業高度。', topic: '職業素養' }, { text: '勇於承擔錯誤是成長的必經之路。', topic: '品格教育' }, { text: '溝通能力是現代人的基本素質。', topic: '溝通技巧' }, { text: '珍惜資源從小事做起。', topic: '節約意識' }, { text: '理解包容是和諧相處的基礎。', topic: '人際關係' }, { text: '志向遠大才能成就大事。', topic: '理想抱負' }, { text: '勤奮學習是通往成功的階梯。', topic: '學習態度' }, { text: '文化遺產需要我們代代傳承。', topic: '文化傳承' }, { text: '公民意識體現個人素質。', topic: '公民教育' }, { text: '創造力是未來社會最寶貴的財富。', topic: '創新能力' }, { text: '尊師重教是中華民族的優良傳統。', topic: '教育傳統' }, { text: '保護生態環境就是保護人類自己。', topic: '生態保護' }, { text: '堅持原則不隨波逐流。', topic: '道德堅守' }, { text: '感恩之心讓生活更美好。', topic: '感恩教育' }, { text: '時間管理是提高效率的關鍵。', topic: '時間管理' }, { text: '獨立思考能力培養需要長期訓練。', topic: '思維訓練' }, { text: '傳統節日承載著民族文化記憶。', topic: '文化記憶' }, { text: '自我反省是進步的動力。', topic: '自我提升' }, { text: '公平正義是社會和諧的基石。', topic: '社會正義' }, { text: '藝術修養豐富精神世界。', topic: '藝術教育' }, { text: '誠信經營是企業發展的根本。', topic: '商業道德' }, { text: '終身學習適應時代發展。', topic: '學習理念' }, { text: '網絡文明需要每個人維護。', topic: '網絡道德' }, { text: '堅韌不拔的意志力戰勝困難。', topic: '意志品質' }],
+            6: [{ text: '民主社會重視每個公民的權利和義務。', topic: '公民教育' }, { text: '批判思考幫助我們分析事物的本質。', topic: '邏輯思維' }, { text: '領導者要有遠見和承擔責任的勇氣。', topic: '領導素養' }, { text: '哲學讓人思考生命的意義和價值。', topic: '人生哲理' }, { text: '實現理想需要堅持不懈的努力。', topic: '理想實現' }, { text: '全球公民意識是世紀的重要素養。', topic: '國際素養' }, { text: '科學精神要求我們追求真理和客觀。', topic: '科學精神' }, { text: '人文關懷體現了人類文明的進步。', topic: '人文精神' }, { text: '批判性思維是現代人必備的能力。', topic: '思維能力' }, { text: '終身學習是適應時代變化的關鍵。', topic: '學習態度' }, { text: '哲學思維幫助我們理解世界的本質。', topic: '哲學思考' }, { text: '邏輯推理是理性思考的基礎。', topic: '邏輯能力' }, { text: '民主制度保障公民的基本權利。', topic: '政治制度' }, { text: '法治社會需要每個人遵守規則。', topic: '法律意識' }, { text: '道德判斷需要理性與情感的平衡。', topic: '道德哲學' }, { text: '文化認同是民族凝聚力的源泉。', topic: '文化認同' }, { text: '創新精神推動人類文明不斷進步。', topic: '創新思維' }, { text: '批判性閱讀提升思維深度。', topic: '閱讀能力' }, { text: '領導力的核心是服務他人。', topic: '領導哲學' }, { text: '全球視野拓展思維邊界。', topic: '國際視野' }, { text: '辯證思維幫助我們全面看問題。', topic: '思維方法' }, { text: '人生價值在於奉獻而非索取。', topic: '人生觀' }, { text: '社會責任感是公民素質的體現。', topic: '責任意識' }, { text: '理性與感性相輔相成。', topic: '認知方式' }, { text: '歷史經驗是未來發展的鏡子。', topic: '歷史思維' }, { text: '文化交流促進文明互鑒。', topic: '文化交流' }, { text: '科學方法論指導研究實踐。', topic: '科學方法' }, { text: '藝術欣賞提升審美境界。', topic: '審美教育' }, { text: '獨立人格是自由的基礎。', topic: '人格發展' }, { text: '知行合一方能成就事業。', topic: '實踐哲學' }, { text: '溝通技巧決定人際關係質量。', topic: '溝通藝術' }, { text: '時間管理體現人生智慧。', topic: '生活智慧' }, { text: '自我認知是成長的起點。', topic: '自我發展' }, { text: '社會公平需要制度保障。', topic: '社會正義' }, { text: '環境倫理關乎人類未來。', topic: '環境哲學' }, { text: '文學作品反映時代精神。', topic: '文學賞析' }, { text: '數學思維培養邏輯能力。', topic: '數學素養' }, { text: '音樂藝術陶冶性情。', topic: '藝術修養' }, { text: '體育精神塑造堅強意志。', topic: '體育品格' }, { text: '網絡素養是現代生活必備技能。', topic: '媒體素養' }, { text: '情緒管理影響人生質量。', topic: '心理健康' }, { text: '團隊精神成就集體智慧。', topic: '協作能力' }, { text: '創業精神推動經濟發展。', topic: '經濟思維' }, { text: '傳統智慧啟迪現代生活。', topic: '文化智慧' }, { text: '科技倫理規範技術應用。', topic: '倫理思考' }, { text: '公共利益高於個人利益。', topic: '公共意識' }]
+        };
+
+        // --- 核心邏輯函數 ---
+        
+        function updateStudentList() {
+            const classSelect = document.getElementById('studentClass');
+            const nameSelect = document.getElementById('studentName');
+            const selectedClass = classSelect.value;
+            nameSelect.innerHTML = '<option value="">請選擇姓名...</option>';
+            if (selectedClass && studentDatabase[selectedClass]) {
+                nameSelect.disabled = false;
+                studentDatabase[selectedClass].forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.name;
+                    option.textContent = `${student.id}. ${student.name}`;
+                    nameSelect.appendChild(option);
+                });
+            } else {
+                nameSelect.disabled = true;
+                nameSelect.innerHTML = '<option value="">請先選擇班級</option>';
+            }
+        }
+
+        function selectGrade(grade, btnElement) {
+            SoundManager.init();
+            const name = document.getElementById('studentName').value;
+            const className = document.getElementById('studentClass').value;
+            if (!name || !className) { showModal('請先選擇班級和姓名'); return; }
+
+            selectedGrade = grade;
+            document.querySelectorAll('.grade-card').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            const selectionDiv = document.getElementById('practiceSelection');
+            selectionDiv.classList.remove('hidden');
+            selectionDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            const gradeVocabulary = vocabularyByGrade[selectedGrade] || [];
+            const gradeSentences = sentencesByGrade[selectedGrade] || [];
+            document.getElementById('vocabCount').textContent = `從${gradeVocabulary.length}個詞彙中隨機選5個`;
+            document.getElementById('articleCount').textContent = `從${gradeSentences.length}個句子中隨機選`;
+        }
+
+        function startVocabularyPractice() {
+            if (!selectedGrade) { showModal('請先選擇年級'); return; }
+            const gradeVocabulary = vocabularyByGrade[selectedGrade] || [];
+            const shuffled = [...gradeVocabulary].sort(() => Math.random() - 0.5);
+            const selectedWords = shuffled.slice(0, 5);
+            const practiceData = { mode: 'vocabulary', grade: selectedGrade, content: selectedWords, title: `${selectedGrade}年級詞彙練習` };
+            currentMode = 'vocabulary';
+            generateVocabularyFromData(practiceData);
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('practiceScreen').classList.remove('hidden');
+            startPractice();
+        }
+
+        function startArticlePractice() {
+            if (!selectedGrade) { showModal('請先選擇年級'); return; }
+            const gradeSentences = sentencesByGrade[selectedGrade] || [];
+            const randomSentence = gradeSentences[Math.floor(Math.random() * gradeSentences.length)];
+            const practiceData = { mode: 'article', content: randomSentence.text, title: randomSentence.topic };
+            currentMode = 'article';
+            generateArticleFromData(practiceData);
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('practiceScreen').classList.remove('hidden');
+            startPractice();
+        }
+
+        function backToMenu() {
+            clearInterval(timer);
+            document.getElementById('practiceScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            document.getElementById('practiceSelection').classList.add('hidden');
+            document.querySelectorAll('.grade-card').forEach(btn => btn.classList.remove('active'));
+            selectedGrade = 0;
+        }
+
+        function restartPractice() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('practiceScreen').classList.remove('hidden');
+            if (currentMode === 'vocabulary') startVocabularyPractice(); 
+            else startArticlePractice();
+        }
+
+        function generateVocabularyFromData(data) {
+            questions = [];
+            data.content.forEach((word, index) => {
+                const cleanWord = word.replace(/[,。!?;:""''()《》、\s]/g, '');
+                if (cleanWord.length === 0) return;
+                const pinyinArray = getPinyin(cleanWord);
+                if (pinyinArray.length > 0) {
+                    questions.push({
+                        character: cleanWord, pinyin: pinyinArray.join(' '), pinyinArray: pinyinArray,
+                        meaning: `詞語 ${index + 1}/${data.content.length}`, word: cleanWord, isWord: true
+                    });
+                }
+            });
+        }
+
+        function generateArticleFromData(data) {
+            questions = [];
+            const sentences = data.content.split(/[。！!？?]/).filter(sentence => {
+                const trimmed = sentence.trim();
+                const cleaned = trimmed.replace(/[,，;；:：""''()（）《》、\s]/g, '');
+                return cleaned.length > 0;
+            });
+            sentences.forEach((sentence, index) => {
+                const originalSentence = sentence.trim();
+                const cleanSentence = originalSentence.replace(/[,，;；:：""''()（）《》、\s]/g, '');
+                if (cleanSentence.length > 0) {
+                    const pinyinArray = getPinyin(cleanSentence);
+                    if (pinyinArray.length > 0) {
+                        const displayChars = [];
+                        let charIndex = 0;
+                        for (let char of originalSentence) {
+                            if (char.match(/[,，;；:：""''()（）《》、\s]/)) {
+                                displayChars.push({ char: char, isPunctuation: true });
+                            } else if (charIndex < cleanSentence.length) {
+                                displayChars.push({ char: char, isPunctuation: false, pinyin: pinyinArray[charIndex] });
+                                charIndex++;
+                            }
+                        }
+                        questions.push({
+                            originalSentence: originalSentence, displayChars: displayChars, cleanSentence: cleanSentence,
+                            meaning: `文章: ${data.title}`, article: data.title, isArticleSentence: true,
+                            sentenceIndex: index + 1, currentCharIndex: 0, charStates: new Array(displayChars.length).fill('pending')
+                        });
+                    }
+                }
+            });
+        }
+
+        function getPinyin(text) {
+            try { return window.pinyinPro.pinyin(text, { toneType: 'symbol', type: 'array' }); } 
+            catch (error) { console.error('拼音錯誤:', error); return []; }
+        }
+        
+        function getInitials(pinyin) {
+            const normalized = normalizePinyin(pinyin).toLowerCase();
+            const initials = ['zh', 'ch', 'sh', 'b', 'p', 'm', 'f', 'd', 't', 'n', 'l', 'g', 'k', 'h', 'j', 'q', 'x', 'r', 'z', 'c', 's', 'y', 'w'];
+            for (const initial of initials) { if (normalized.startsWith(initial)) return initial; }
+            return '';
+        }
+
+        function getFinals(pinyin) {
+            const normalized = normalizePinyin(pinyin).toLowerCase();
+            const initial = getInitials(normalized);
+            return initial ? normalized.slice(initial.length) : normalized;
+        }
+
+        const toneMarks = {
+            'a': ['a', 'ā', 'á', 'ǎ', 'à', 'a'], 'o': ['o', 'ō', 'ó', 'ǒ', 'ò', 'o'], 'e': ['e', 'ē', 'é', 'ě', 'è', 'e'],
+            'i': ['i', 'ī', 'í', 'ǐ', 'ì', 'i'], 'u': ['u', 'ū', 'ú', 'ǔ', 'ù', 'u'], 'ü': ['ü', 'ǖ', 'ǘ', 'ǚ', 'ǜ', 'ü'], 'v': ['ü', 'ǖ', 'ǘ', 'ǚ', 'ǜ', 'ü']
+        };
+
+        function convertNumberToneToSymbol(pinyin) {
+            const match = pinyin.match(/^([a-züA-ZÜĀĒĪŌŪǕÁÉÍÓÚǗǍĚǏǑǓǙÀÈÌÒÙǛ]+)([1-5]?)$/);
+            if (!match) return pinyin;
+            let [, syllable, tone] = match;
+            tone = parseInt(tone) || 5;
+            if (tone === 5) return syllable;
+            syllable = syllable.toLowerCase();
+            let result = syllable;
+            if (syllable.includes('a')) result = syllable.replace('a', toneMarks['a'][tone]);
+            else if (syllable.includes('o')) result = syllable.replace('o', toneMarks['o'][tone]);
+            else if (syllable.includes('e')) result = syllable.replace('e', toneMarks['e'][tone]);
+            else if (syllable.includes('iu')) result = syllable.replace('u', toneMarks['u'][tone]);
+            else if (syllable.includes('ui')) result = syllable.replace('i', toneMarks['i'][tone]);
+            else if (syllable.includes('i')) result = syllable.replace('i', toneMarks['i'][tone]);
+            else if (syllable.includes('u')) result = syllable.replace('u', toneMarks['u'][tone]);
+            else if (syllable.includes('ü') || syllable.includes('v')) result = syllable.replace(/[üv]/, toneMarks['ü'][tone]);
+            return result;
+        }
+
+        function convertSymbolToneToNumber(pinyin) {
+            const tonePattern = /[āēīōūǖáéíóúǘǎěǐǒǔǚàèìòùǜ]/;
+            const match = pinyin.match(tonePattern);
+            if (!match) return pinyin + '5';
+            const char = match[0];
+            let tone = 5;
+            for (const [vowel, marks] of Object.entries(toneMarks)) {
+                const index = marks.indexOf(char);
+                if (index > 0) { tone = index; break; }
+            }
+            let result = pinyin;
+            for (const [vowel, marks] of Object.entries(toneMarks)) {
+                for (let i = 1; i < marks.length; i++) result = result.replace(marks[i], marks[0]);
+            }
+            return result + tone;
+        }
+
+        function normalizePinyin(pinyin) {
+            let result = pinyin.toLowerCase();
+            for (const [vowel, marks] of Object.entries(toneMarks)) {
+                for (let i = 1; i < marks.length; i++) {
+                    result = result.replace(new RegExp(marks[i], 'g'), marks[0]);
+                }
+            }
+            result = result.replace(/v/g, 'ü').replace(/[1-5]$/, '');
+            return result;
+        }
+
+        function comparePinyin(userInput, correctAnswer) {
+            userInput = userInput.trim().replace(/\s+/g, ' ');
+            correctAnswer = correctAnswer.trim().replace(/\s+/g, ' ');
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) return true;
+            if (correctAnswer.includes(' ')) return compareMultiSyllablePinyin(userInput, correctAnswer);
+            return compareSingleSyllablePinyin(userInput, correctAnswer);
+        }
+
+        function compareMultiSyllablePinyin(userInput, correctAnswer) {
+            const userSyllables = userInput.split(/\s+/);
+            const correctSyllables = correctAnswer.split(/\s+/);
+            if (userSyllables.length !== correctSyllables.length) return false;
+            for (let i = 0; i < userSyllables.length; i++) {
+                if (!compareSingleSyllablePinyin(userSyllables[i], correctSyllables[i])) return false;
+            }
+            return true;
+        }
+
+        function compareSingleSyllablePinyin(userInput, correctAnswer) {
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) return true;
+            const userWithNumber = userInput.match(/\d$/) ? userInput : convertSymbolToneToNumber(userInput);
+            const correctWithNumber = correctAnswer.match(/\d$/) ? correctAnswer : convertSymbolToneToNumber(correctAnswer);
+            return userWithNumber.toLowerCase() === correctWithNumber.toLowerCase();
+        }
+
+        function startPractice() {
+            currentQuestion = 0; combo = 0; maxCombo = 0; correctAnswers = 0; wrongAnswers = 0; startTime = Date.now();
+            document.getElementById('modeTitle').textContent = currentMode === 'vocabulary' ? '📚 詞彙練習' : '📝 文章練習';
+            updateDisplay();
+            showCurrentQuestion();
+            startTimer();
+            const input = document.getElementById('pinyinInput');
+            input.oninput = function(e) {
+                SoundManager.playType();
+                const val = input.value;
+                const lastChar = val.slice(-1);
+                if (/[1-5]/.test(lastChar)) {
+                    const parts = val.split(' ');
+                    const lastPartIndex = parts.length - 1;
+                    let lastPart = parts[lastPartIndex];
+                    if (/[a-zA-ZüÜ]+[1-5]$/.test(lastPart)) {
+                        const converted = convertNumberToneToSymbol(lastPart);
+                        parts[lastPartIndex] = converted;
+                        input.value = parts.join(' ');
+                    }
+                }
+            };
+            input.onkeypress = function(e) { if (e.key === 'Enter') checkAnswer(); };
+        }
+
+        function showCurrentQuestion() {
+            if (currentQuestion >= questions.length) { completePractice(); return; }
+            const question = questions[currentQuestion];
+            const characterEl = document.getElementById('currentCharacter');
+            if (question.isArticleSentence) {
+                while (question.currentCharIndex < question.displayChars.length && question.displayChars[question.currentCharIndex].isPunctuation) {
+                    question.charStates[question.currentCharIndex] = 'skipped';
+                    question.currentCharIndex++;
+                }
+                if (question.currentCharIndex < question.displayChars.length) {
+                    const currentCharData = question.displayChars[question.currentCharIndex];
+                    if (currentCharData && !currentCharData.isPunctuation) question.charStates[question.currentCharIndex] = 'current';
+                }
+                renderArticleSentence(question);
+                document.getElementById('characterMeaning').textContent = question.meaning;
+                characterEl.className = 'glass-panel inline-block w-full p-8 text-3xl md:text-4xl font-black text-gray-800 leading-relaxed text-left relative z-10 shadow-xl font-sans mt-8';
+            } else {
+                characterEl.textContent = question.character;
+                characterEl.className = 'glass-panel inline-block min-w-[260px] p-12 text-5xl md:text-6xl font-black text-gray-800 relative z-10 shadow-2xl transform transition hover:scale-105 duration-300 font-sans mt-8';
+                document.getElementById('characterMeaning').textContent = question.meaning;
+            }
+            document.getElementById('pinyinInput').value = '';
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('hintDisplay').textContent = '';
+            hintUsed = false;
+            document.getElementById('pinyinInput').focus();
+        }
+
+        function renderArticleSentence(question) {
+            const characterEl = document.getElementById('currentCharacter');
+            characterEl.innerHTML = '';
+            question.displayChars.forEach((charData, index) => {
+                const span = document.createElement('span');
+                span.textContent = charData.char;
+                span.className = 'inline-block mx-1 px-2 py-1 rounded-lg transition-all duration-300';
+                if (charData.isPunctuation) span.className += ' text-gray-400';
+                else {
+                    switch (question.charStates[index]) {
+                        case 'correct': span.className += ' bg-green-100 text-green-600 shadow-sm transform scale-105'; break;
+                        case 'wrong': span.className += ' bg-red-100 text-red-600 shadow-sm animate-shake'; break;
+                        case 'current': span.className += ' bg-theme-main text-white ring-4 ring-blue-200 transform scale-125 shadow-lg z-20 relative'; break;
+                        default: span.className += ' text-gray-700';
+                    }
+                }
+                characterEl.appendChild(span);
+            });
+        }
+
+        function updateDisplay() {
+            const completedQuestions = currentQuestion + 1;
+            document.getElementById('progressText').textContent = `${completedQuestions}/${questions.length}`;
+            document.getElementById('progressBar').style.width = `${(completedQuestions / questions.length) * 100}%`;
+        }
+
+        function checkAnswer() {
+            const question = questions[currentQuestion];
+            if (!question) return;
+            if (question.isArticleSentence) checkArticleCharAnswer(); else checkVocabularyAnswer();
+        }
+
+        function checkArticleCharAnswer() {
+            const input = document.getElementById('pinyinInput');
+            const userAnswer = input.value.trim();
+            const question = questions[currentQuestion];
+            if (!userAnswer) { showModal('請輸入拼音'); return; }
+            let currentCharData = null;
+            let currentIndex = question.currentCharIndex;
+            while (currentIndex < question.displayChars.length) {
+                if (!question.displayChars[currentIndex].isPunctuation) { currentCharData = question.displayChars[currentIndex]; break; }
+                currentIndex++;
+            }
+            if (!currentCharData) { completeSentence(); return; }
+            const correctPinyin = currentCharData.pinyin;
+            const feedback = document.getElementById('feedback');
+            if (comparePinyin(userAnswer, correctPinyin)) {
+                SoundManager.playCorrect();
+                question.charStates[currentIndex] = 'correct';
+                correctAnswers++; combo++; maxCombo = Math.max(maxCombo, combo);
+                feedback.innerHTML = `<div class="text-green-600 font-black text-2xl animate-pop">✨ 正確!</div>`;
+                question.currentCharIndex = currentIndex + 1;
+                while (question.currentCharIndex < question.displayChars.length && question.displayChars[question.currentCharIndex].isPunctuation) {
+                    question.charStates[question.currentCharIndex] = 'skipped';
+                    question.currentCharIndex++;
+                }
+                if (question.currentCharIndex >= question.displayChars.length) setTimeout(() => completeSentence(), 800);
+                else setTimeout(() => { renderArticleSentence(question); showCurrentQuestion(); document.getElementById('feedback').innerHTML = ''; hintUsed = false; }, 800);
+            } else {
+                SoundManager.playWrong();
+                wrongAnswers++; question.charStates[currentIndex] = 'wrong'; combo = 0;
+                feedback.innerHTML = `<div class="text-red-500 font-black animate-pop text-xl">😅 加油！正確是: ${correctPinyin}</div>`;
+                setTimeout(() => { question.charStates[currentIndex] = 'current'; renderArticleSentence(question); document.getElementById('pinyinInput').value = ''; document.getElementById('feedback').innerHTML = ''; }, 2000);
+            }
+            renderArticleSentence(question); updateDisplay();
+        }
+
+        function checkVocabularyAnswer() {
+            const input = document.getElementById('pinyinInput');
+            const userAnswer = input.value.trim();
+            const question = questions[currentQuestion];
+            const correctAnswer = question.pinyin;
+            if (!userAnswer) { showModal('請輸入拼音'); return; }
+            const feedback = document.getElementById('feedback');
+            if (comparePinyin(userAnswer, correctAnswer)) {
+                SoundManager.playCorrect();
+                correctAnswers++; combo++; maxCombo = Math.max(maxCombo, combo);
+                feedback.innerHTML = `<div class="text-green-600 font-black text-3xl animate-pop">🎉 答對了！</div>`;
+                setTimeout(() => { currentQuestion++; showCurrentQuestion(); }, 1000);
+            } else {
+                SoundManager.playWrong();
+                wrongAnswers++; combo = 0;
+                feedback.innerHTML = `<div class="text-red-500 font-black animate-pop text-xl">🤔 哎呀！正確是: ${question.pinyin}</div>`;
+                setTimeout(() => { currentQuestion++; showCurrentQuestion(); }, 2500);
+            }
+            updateDisplay();
+        }
+
+        function completeSentence() {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = `<div class="text-theme-main font-black text-3xl animate-pop">🌟 句子完成！</div>`;
+            setTimeout(() => { currentQuestion++; showCurrentQuestion(); }, 1500);
+        }
+
+        function addTone(tone) {
+            const input = document.getElementById('pinyinInput');
+            let value = input.value.trim();
+            if (!value) return;
+            const btn = document.querySelector(`.tone-${tone}`);
+            btn.classList.remove('animate-jelly'); void btn.offsetWidth; btn.classList.add('animate-jelly');
+            if (value.includes(' ')) {
+                const syllables = value.split(' ');
+                const lastSyllableIndex = syllables.length - 1;
+                let lastSyllable = normalizePinyin(syllables[lastSyllableIndex]);
+                syllables[lastSyllableIndex] = tone === 5 ? lastSyllable : convertNumberToneToSymbol(lastSyllable + tone);
+                input.value = syllables.join(' ');
+            } else {
+                const cleanSyllable = normalizePinyin(value);
+                input.value = tone === 5 ? cleanSyllable : convertNumberToneToSymbol(cleanSyllable + tone);
+            }
+            input.focus();
+        }
+
+        function toggleHint(type) {
+            const question = questions[currentQuestion];
+            if (!question) return;
+            const hintDisplay = document.getElementById('hintDisplay');
+            let hintText = '';
+            if (question.isArticleSentence) {
+                const currentCharData = question.displayChars[question.currentCharIndex];
+                if (currentCharData && !currentCharData.isPunctuation) {
+                    const currentPinyin = currentCharData.pinyin;
+                    switch(type) {
+                        case 'initials': hintText = getInitials(currentPinyin); break;
+                        case 'finals': hintText = getFinals(currentPinyin); break;
+                        case 'full': hintText = currentPinyin; break;
+                    }
+                }
+            } else if (question.isWord && question.pinyinArray) {
+                switch(type) {
+                    case 'initials': hintText = question.pinyinArray.map(p => getInitials(p)).join(' '); break;
+                    case 'finals': hintText = question.pinyinArray.map(p => getFinals(p)).join(' '); break;
+                    case 'full': hintText = question.pinyin; break;
+                }
+            }
+            if (hintDisplay.textContent === hintText) hintDisplay.textContent = '';
+            else { hintDisplay.textContent = hintText; hintUsed = true; }
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function completePractice() {
+            SoundManager.playFanfare();
+            clearInterval(timer);
+            const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsedSeconds / 60);
+            const seconds = elapsedSeconds % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const totalAttempts = correctAnswers + wrongAnswers;
+            const accuracy = totalAttempts === 0 ? 0 : Math.round((correctAnswers / totalAttempts) * 100);
+            const finalScore = accuracy; 
+            document.getElementById('resultTime').textContent = timeString;
+            document.getElementById('resultWrong').textContent = wrongAnswers;
+            document.getElementById('resultCombo').textContent = maxCombo;
+            document.getElementById('resultAccuracy').textContent = accuracy + '%';
+            document.getElementById('resultScore').textContent = finalScore;
+            document.getElementById('practiceScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+        }
+
+        function submitScore() {
+            const name = document.getElementById('studentName').value;
+            const className = document.getElementById('studentClass').value;
+            const submitBtn = document.querySelector('#resultScreen button.btn-primary');
+            if (!name || !className) { showModal('請確保已填寫姓名和班級！'); return; }
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ 提交中...';
+            const data = {
+                name: name, class: className, grade: selectedGrade,
+                mode: currentMode === 'vocabulary' ? '詞語練習' : '文章練習',
+                time: document.getElementById('resultTime').textContent,
+                wrong: document.getElementById('resultWrong').textContent,
+                combo: document.getElementById('resultCombo').textContent,
+                accuracy: document.getElementById('resultAccuracy').textContent,
+                score: document.getElementById('resultScore').textContent
+            };
+            // ---------------------------------------------------------
+            // 這裡已經替換成您的專屬網址了
+            // ---------------------------------------------------------
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwxoER-K_w2suEJjPU1dr0nq5D8_mL30hV3if3Vhr1qMH57rFub6D7ZvOqfEyaVg3oM/exec'; 
+            
+            fetch(scriptURL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(data)
+            })
+            .then(response => { showModal(`🎉 ${name} 同學，你的成績已成功提交給老師！`); submitBtn.innerHTML = '✅ 已提交'; })
+            .catch(error => { console.error('Error:', error); showModal('提交失敗，請檢查網絡連線或通知老師。'); submitBtn.disabled = false; submitBtn.innerHTML = '📤 提交給老師'; });
+        }
+
+        function showModal(message) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('modalMessage').textContent = message;
+            modal.classList.remove('hidden');
+            document.getElementById('modalConfirm').onclick = () => modal.classList.add('hidden');
+        }
+        
+        function refreshQuestions() {
+            clearInterval(timer);
+            currentQuestion = 0; combo = 0; correctAnswers = 0; wrongAnswers = 0; startTime = Date.now();
+            if (currentMode === 'vocabulary') {
+                const gradeVocabulary = vocabularyByGrade[selectedGrade] || [];
+                const shuffled = [...gradeVocabulary].sort(() => Math.random() - 0.5);
+                const selectedWords = shuffled.slice(0, 5);
+                const practiceData = { mode: 'vocabulary', grade: selectedGrade, content: selectedWords, title: `${selectedGrade}年級詞彙練習` };
+                generateVocabularyFromData(practiceData);
+            } else {
+                const gradeSentences = sentencesByGrade[selectedGrade] || [];
+                const randomSentence = gradeSentences[Math.floor(Math.random() * gradeSentences.length)];
+                const practiceData = { mode: 'article', content: randomSentence.text, title: randomSentence.topic };
+                generateArticleFromData(practiceData);
+            }
+            updateDisplay(); showCurrentQuestion(); startTimer();
+        }
+    </script>
+</body>
+</html>
